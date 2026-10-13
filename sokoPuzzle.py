@@ -19,12 +19,37 @@ class SokoPuzzle:
 
 
 
-    # Rôle : applique une action U/D/L/R (avance ou pousse une caisse), None si invalide 
-    # cette fonction utilise : deepcopy, DIRECTIONS
-    def _move(self, action):  
-        ...
+    # move to a direction (U, D, L, R) if possible, return new state or None
+    def _move(self, action):
+        di, dj = DIRECTIONS[action]               
+        i, j = self.robot_position                 # position of the robot
+        ni, nj = i + di, j + dj                    # next position of the robot
+        next_cell = self.board[ni][nj]             # the content of the next cell in the board
+
+        # 1. whole
+        if next_cell == 'O':
+            return None
+        
+        # 2. box in front
+        if next_cell in ('B', '*'):
+            bi, bj = ni + di, nj + dj            # position of the cell behind the box
+            behind = self.board[bi][bj]
+            if behind not in (' ', 'S'):         # verify if the box can be pushed
+                return None
+
+        new_state = deepcopy(self)                # create a new state to avoid modifying the current one
+
+        # 2. box in front
+        if next_cell in ('B', '*'):
+            new_state.board[bi][bj] = 'B' if behind == ' ' else '*'      # box moves: R B ' ' -> ' ' R B  | R B S -> ' ' R *
+            new_state.board[ni][nj] = 'R' if next_cell == 'B' else '.'   # robot takes box cell: R B -> R |   R * -> '.' (robot on target)
+        else:
+            new_state.board[ni][nj] = 'R' if next_cell == ' ' else '.'   # no box: R ' ' -> ' ' R   |   R S -> ' ' .
+ 
+        new_state.board[i][j] = ' ' if self.board[i][j] == 'R' else 'S'  # exit cell: R -> ' '   |   '.' -> S   (target shows again)
+        new_state.robot_position = (ni, nj)                              # update position on the new state
+        return new_state
 
 
     # Rôle : retourne [(action, nouvel_état), ...] pour les mouvements valides 
-    # cette fonction utilise : self._move
     def successorFunction(self): ...
