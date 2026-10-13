@@ -6,7 +6,7 @@ from sokoPuzzle import SokoPuzzle
 
 class Search:
 
-    # Rôle : BFS, retourne (goalNode, num_steps)  (P3)
+    # Rôle : BFS, retourne (goalNode, num_steps)  
     # cette fonction utilise : state.isGoal(), state.successorFunction(), Node(...), `in closed` (-> __eq__)
     @staticmethod
     def breadthFirst(initial_node): ...     
