@@ -1,4 +1,3 @@
-# Attributs communs : board (matrice 2D avec les 7 symboles), robot_position (i, j), rows, cols, moves
 # Symboles : R robot | O mur | ' ' vide | S cible | B caisse | . robot sur cible | * caisse sur cible
 from copy import deepcopy
 
@@ -8,6 +7,7 @@ DIRECTIONS = {"U": (-1, 0), "D": (1, 0), "L": (0, -1), "R": (0, 1)}
 class SokoPuzzle:
 
     # Rôle : construit l'état à partir de la matrice board 
+    # create here : self.board, self.moves ,self.robot_position , self.rows, self.cols
     def __init__(self, board): ...
 
     # Rôle : True si toutes les caisses sont sur des cibles 
@@ -51,5 +51,11 @@ class SokoPuzzle:
         return new_state
 
 
-    # Rôle : retourne [(action, nouvel_état), ...] pour les mouvements valides 
-    def successorFunction(self): ...
+    # returns a list of (action, new_state) pairs for all valid moves from the current state
+    def successorFunction(self):
+        successors = []                             # empty list
+        for action in self.moves:                   # "U", "D", "L", "R"
+            new_state = self._move(action)          # new state or None
+            if new_state is not None:               # None = invalid move, ignore it
+                successors.append((action, new_state))  # e.g. ("D", state_D)
+        return successors                           # 0 to 4 pairs
