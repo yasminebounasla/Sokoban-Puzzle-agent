@@ -2,10 +2,10 @@ from collections import deque
 from node import Node
 from soko_puzzle import SokoPuzzle
 
-# ---------------------------------------------------------
+
 # Test levels (board1 ... board5)
 # Symbols: 'R' player, 'O' wall, ' ' empty, 'S' target, 'B' box
-# ---------------------------------------------------------
+
 board1 = [
     "OOOOOOOOO",
     "O       O",
@@ -58,9 +58,7 @@ board5 = [
 ]
 
 
-# ---------------------------------------------------------
 # (BFS) algorithm
-# ---------------------------------------------------------
 def breadthFirst(initial_node):
     # Quick check: the root itself may already be a goal
     if initial_node.state.isGoal():
@@ -98,9 +96,8 @@ def breadthFirst(initial_node):
     # No solution found
     return None
 
-# ---------------------------------------------------------
+
 # main : launch BFS on a chosen board
-# ---------------------------------------------------------
 def main():
     # Select the board (feel free to switch to board2, board3, ...)
     board = board1
