@@ -1,100 +1,107 @@
 from collections import deque
 from node import Node
-from soko_puzzle import SokoPuzzle
+from sokoPuzzle import SokoPuzzle
 
 
 # Test levels (board1 ... board5)
 # Symbols: 'R' player, 'O' wall, ' ' empty, 'S' target, 'B' box
 
 board1 = [
-    "OOOOOOOOO",
-    "O       O",
-    "O R B S O",
-    "O       O",
-    "OOOOOOOOO",
+    "OOOOOO",
+    "OS B O",
+    "O OR O",
+    "O    O",
+    "O    O",
+    "OOOOOO",
 ]
 
 board2 = [
-    "OOOOOOOO",
-    "O      O",
-    "O R B  O",
-    "O     SO",
-    "O      O",
-    "OOOOOOOO",
+    "OOOOOOOOO",
+    "O       O",
+    "O       O",
+    "O  OOO  O",
+    "O    O. O",
+    "O     O O",
+    "O  B  O O",
+    "O     O O",
+    "OOOOOOOOO",
 ]
 
 board3 = [
-    "OOOOOOOOO",
-    "O       O",
-    "O R B S O",
-    "O       O",
-    "O B S   O",
-    "O       O",
-    "OOOOOOOOO",
+    "OOOOOOOO",
+    "O   O  O",
+    "O  BR  O",
+    "O   OB O",
+    "OOOOO SO",
+    "    O SO",
+    "    OOOO",
 ]
 
 board4 = [
-    "  OOOOO  ",
-    "  O   O  ",
-    "  O B O  ",
-    "  O S O  ",
-    "  O   O  ",
-    "OOOO OOOO",
-    "O        O",
-    "O  R  B  O",
-    "O       SO",
-    "OOOOOOOOOO",
+    " OOOO  ",
+    " O  O  ",
+    " O  OOO",
+    " O *  O",
+    "OOBOB O",
+    "O SRS O",
+    "O    OO",
+    "OOO  O ",
+    "  OOOO ",
 ]
 
 board5 = [
-    "OOOOOOOOOO",
-    "O        O",
-    "O  R  B  O",
-    "O      S O",
-    "O  B     O",
-    "O     S  O",
-    "O        O",
-    "OOOOOOOOOO",
+    "  OOOOOO ",
+    "OOOSO  O ",
+    "O    B OO",
+    "O B R  SO",
+    "OOO O OOO",
+    "  OBO O  ",
+    "  O  SO  ",
+    "  OOOOO  ",
 ]
 
+class Search:
+    # (BFS) algorithm
+    def breadthFirst(initial_node):
+        # Quick check: the root itself may already be a goal
+        if initial_node.state.isGoal():
+            return initial_node
 
-# (BFS) algorithm
-def breadthFirst(initial_node):
-    # Quick check: the root itself may already be a goal
-    if initial_node.state.isGoal():
-        return initial_node
+        # FIFO queue: first-in, first-out
+        frontier = deque([initial_node])
 
-    # FIFO queue: first-in, first-out
-    frontier = deque([initial_node])
+        # Set of visited states (to avoid revisiting)
+        explored = set()
+        explored.add(initial_node.state)
 
-    # Set of visited states (to avoid revisiting)
-    explored = set()
-    explored.add(initial_node.state)
+        while frontier:
+            # Pop the first node from the queue
+            node = frontier.popleft()
 
-    while frontier:
-        # Pop the first node from the queue
-        node = frontier.popleft()
+            # Expand the node: generate children via successorFunction()
+            for action, new_state in node.state.successorFunction():
+                # Only consider newly discovered states
+                if new_state not in explored:
+                    child = Node(
+                        state=new_state,
+                        parent=node,
+                        action=action,
+                        g=node.g + 1
+                    )
 
-        # Expand the node: generate children via successorFunction()
-        for action, new_state in node.state.successorFunction():
-            # Only consider newly discovered states
-            if new_state not in explored:
-                child = Node(
-                    state=new_state,
-                    parent=node,
-                    action=action,
-                    g=node.g + 1
-                )
+                    # Goal test before enqueueing (early exit optimization)
+                    if new_state.isGoal():
+                        return child
 
-                # Goal test before enqueueing (early exit optimization)
-                if new_state.isGoal():
-                    return child
+                    frontier.append(child)
+                    explored.add(new_state)
 
-                frontier.append(child)
-                explored.add(new_state)
+        # No solution found
+        return None
 
-    # No solution found
-    return None
+
+
+USE_GUI = True
 
 
 # main : launch BFS on a chosen board
@@ -115,7 +122,7 @@ def main():
     print("\nRunning BFS ...\n")
 
     # 3) Run BFS
-    goal_node = breadthFirst(root)
+    goal_node = Search.breadthFirst(root)
 
     # 4) Display the results
     if goal_node is None:
