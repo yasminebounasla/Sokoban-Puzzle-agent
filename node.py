@@ -1,15 +1,30 @@
 class Node:
-    
     def __init__(self, state, parent=None, action=None, g=0):
-        self.state = state      # the game state (SokoPuzzle)
-        self.parent = parent    # node we come from (None for the first node)
-        self.action = action    # action that created this node ("U", "D", "L", "R")
-        self.g = g              # path cost = number of actions so far
+     
+        self.state = state
+        self.parent = parent
+        self.action = action
+        self.g = g
+        
+    
+    def getPath(self):  # list of states from the root to this node
+        path = []
+        current = self
+        while current is not None:
+            path.append(current.state)
+            current = current.parent
+        path.reverse()
+        return path
 
-    # Rôle : liste des états du début jusqu'à ce nœud
-    # cette fonction utilise : self.parent (remonte la chaîne)
-    def getPath(self): ...
+    def getSolution(self): #  list of actions from the root to this node
+      
+        actions = []
+        current = self
+        while current is not None and current.action is not None:
+            actions.append(current.action)
+            current = current.parent
+        actions.reverse()
+        return actions
 
-    # Rôle : liste des actions du début jusqu'à ce nœud
-    # cette fonction utilise : self.parent, self.action
-    def getSolution(self): ...
+    def __repr__(self):
+        return f"Node(action={self.action}, g={self.g})"
