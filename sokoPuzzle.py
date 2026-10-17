@@ -16,7 +16,8 @@ class SokoPuzzle:
     # Rôle : compare 2 états (robot + caisses), appelée par `in closed` dans le BFS 
     def __eq__(self, other): ...
 
-
+    def __hash__(self):
+        return hash(tuple("".join(row) for row in self.board))
 
 
     # move to a direction (U, D, L, R) if possible, return new state or None
