@@ -111,3 +111,6 @@ class SokoPuzzle:
             if new_state is not None:               # None = invalid move, ignore it
                 successors.append((action, new_state))  # e.g. ("D", state_D)
         return successors                           # 0 to 4 pairs
+
+    def __str__(self):
+        return "\n".join("".join(row) for row in self.board)

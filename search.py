@@ -1,6 +1,7 @@
 from collections import deque
 from node import Node
 from sokoPuzzle import SokoPuzzle
+from gui import animate_solution
 
 
 # Test levels (board1 ... board5)
@@ -137,6 +138,14 @@ def main():
     print("\nFinal state:")
     print(goal_node.state)
     print("=" * 50)
+
+    if USE_GUI:
+        path = goal_node.getPath()
+        animate_solution(
+            path,
+            goal_node.g,
+            len(goal_node.getSolution())
+    )
 
 
 if __name__ == "__main__":
