@@ -8,13 +8,64 @@ class SokoPuzzle:
 
     # Rôle : construit l'état à partir de la matrice board 
     # create here : self.board, self.moves ,self.robot_position , self.rows, self.cols
-    def __init__(self, board): ...
+    def __init__(self, board):
+         # Convert each row into a list of characters
+        self.board = [list(row) for row in board]
+
+        # Board dimensions
+        self.rows = len(self.board)
+        self.cols = len(self.board[0])
+
+        # Possible movements
+        self.moves = list(DIRECTIONS.keys())
+
+        # Find the robot's position
+        self.robot_position = None
+
+        for i, row in enumerate(self.board):
+            for j, cell in enumerate(row):
+                if cell in ('R', '.'):
+                    self.robot_position = (i, j)
+                    break
+
+            if self.robot_position is not None:
+                break 
 
     # Rôle : True si toutes les caisses sont sur des cibles 
-    def isGoal(self): ...
+    def isGoal(self): 
+        # Count all boxes
+        boxes = sum(
+            cell in ('B', '*')
+            for row in self.board
+            for cell in row
+        )
+
+        # Count all targets
+        targets = sum(
+            cell in ('S', '.', '*')
+            for row in self.board
+            for cell in row
+        )
+
+        # Count boxes placed on targets
+        boxes_on_targets = sum(
+            cell == '*'
+            for row in self.board
+            for cell in row
+        )
+
+        # The puzzle is solved when every box is on a target
+        return boxes == targets and boxes_on_targets == boxes
+
 
     # Rôle : compare 2 états (robot + caisses), appelée par `in closed` dans le BFS 
-    def __eq__(self, other): ...
+    def __eq__(self, other): 
+         # Check that the other object is a SokoPuzzle
+        if not isinstance(other, SokoPuzzle):
+            return False
+
+        # Compare the two boards
+        return self.board == other.board
 
     def __hash__(self):
         return hash(tuple("".join(row) for row in self.board))
