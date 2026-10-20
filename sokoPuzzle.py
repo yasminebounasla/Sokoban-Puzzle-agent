@@ -1,20 +1,21 @@
-# Symboles : R robot | O mur | ' ' vide | S cible | B caisse | . robot sur cible | * caisse sur cible
 from copy import deepcopy
 
 DIRECTIONS = {"U": (-1, 0), "D": (1, 0), "L": (0, -1), "R": (0, 1)}
 
 
+# Symbols: 'R' player, 'O' wall, ' ' empty, 'S' target, 'B' box, '.' player on target, '*' box on target
+
 class SokoPuzzle:
 
-    # Rôle : construit l'état à partir de la matrice board 
-    # create here : self.board, self.moves ,self.robot_position , self.rows, self.cols
+    # create a state from a board (list of strings)
     def __init__(self, board):
-         # Convert each row into a list of characters
+
+        # Convert each row into a list of characters
         self.board = [list(row) for row in board]
 
         # Board dimensions
-        self.rows = len(self.board)
-        self.cols = len(self.board[0])
+        self.rows = len(self.board)    
+        self.cols = len(self.board[0]) 
 
         # Possible movements
         self.moves = list(DIRECTIONS.keys())
@@ -24,14 +25,14 @@ class SokoPuzzle:
 
         for i, row in enumerate(self.board):
             for j, cell in enumerate(row):
-                if cell in ('R', '.'):
+                if cell in ('R', '.'):              # robot is on a target (.) or on a normal cell (R)
                     self.robot_position = (i, j)
                     break
 
             if self.robot_position is not None:
                 break 
 
-    # Rôle : True si toutes les caisses sont sur des cibles 
+    # True if all boxes are on targets
     def isGoal(self): 
         # Count all boxes
         boxes = sum(
@@ -58,15 +59,17 @@ class SokoPuzzle:
         return boxes == targets and boxes_on_targets == boxes
 
 
-    # Rôle : compare 2 états (robot + caisses), appelée par `in closed` dans le BFS 
+    # compare 2 states (robot + boxes), called by `in closed` in the BFS
     def __eq__(self, other): 
-         # Check that the other object is a SokoPuzzle
+         # Check that the other object is a SokoPuzzle object
         if not isinstance(other, SokoPuzzle):
             return False
 
         # Compare the two boards
         return self.board == other.board
 
+
+    # 
     def __hash__(self):
         return hash(tuple("".join(row) for row in self.board))
 

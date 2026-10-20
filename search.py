@@ -96,8 +96,11 @@ class Search:
                     if new_state.isGoal():
                         return child
 
-                    frontier.append(child)
-                    explored.add(new_state)
+                    if (
+                        child.state not in explored
+                        and not any(n.state == child.state for n in frontier)
+                    ):
+                        frontier.append(child)
 
         # No solution found
         return None
