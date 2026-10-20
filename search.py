@@ -96,7 +96,7 @@ class Search:
                     if new_state.isGoal():
                         return child
 
-                    if (
+                    if (    # to make sure we don't explore the same state again, we check both explored and frontier
                         child.state not in explored
                         and not any(n.state == child.state for n in frontier)
                     ):
