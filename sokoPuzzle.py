@@ -76,7 +76,7 @@ class SokoPuzzle:
 
     # move to a direction (U, D, L, R) if possible, return new state or None
     def _move(self, action):
-        di, dj = DIRECTIONS[action]               
+        di, dj = DIRECTIONS[action]                # direction vector for the action
         i, j = self.robot_position                 # position of the robot
         ni, nj = i + di, j + dj                    # next position of the robot
         next_cell = self.board[ni][nj]             # the content of the next cell in the board
@@ -95,13 +95,13 @@ class SokoPuzzle:
         new_state = deepcopy(self)                # create a new state to avoid modifying the current one
 
         # 2. box in front
-        if next_cell in ('B', '*'):
+        if next_cell in ('B', '*'): # if the cell in front of the robot is a box, we need to move the box as well , behind the box must be empty or a target
             new_state.board[bi][bj] = 'B' if behind == ' ' else '*'      # box moves: R B ' ' -> ' ' R B  | R B S -> ' ' R *
             new_state.board[ni][nj] = 'R' if next_cell == 'B' else '.'   # robot takes box cell: R B -> R |   R * -> '.' (robot on target)
         else:
             new_state.board[ni][nj] = 'R' if next_cell == ' ' else '.'   # no box: R ' ' -> ' ' R   |   R S -> ' ' .
  
-        new_state.board[i][j] = ' ' if self.board[i][j] == 'R' else 'S'  # exit cell: R -> ' '   |   '.' -> S   (target shows again)
+        new_state.board[i][j] = ' ' if self.board[i][j] == 'R' else 'S'  # remove old robot position: R ' ' -> ' ' | . S -> S (without it the robot robot will show up in 2 places)
         new_state.robot_position = (ni, nj)                              # update position on the new state
         return new_state
 
@@ -115,5 +115,5 @@ class SokoPuzzle:
                 successors.append((action, new_state))  # e.g. ("D", state_D)
         return successors                           # 0 to 4 pairs
 
-    def __str__(self):
+    def __str__(self): # used for printing the board in a readable format
         return "\n".join("".join(row) for row in self.board)
