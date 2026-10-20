@@ -5,7 +5,7 @@ from gui import animate_solution
 
 
 # Test levels (board1 ... board5)
-# Symbols: 'R' player, 'O' wall, ' ' empty, 'S' target, 'B' box
+# Symbols: 'R' player, 'O' wall, ' ' empty, 'S' target, 'B' box, '.' player on target, '*' box on target
 
 board1 = [
     "OOOOOO",
@@ -64,6 +64,7 @@ board5 = [
 class Search:
     # (BFS) algorithm
     def breadthFirst(initial_node):
+
         # Quick check: the root itself may already be a goal
         if initial_node.state.isGoal():
             return initial_node
@@ -73,11 +74,12 @@ class Search:
 
         # Set of visited states (to avoid revisiting)
         explored = set()
-        explored.add(initial_node.state)
 
         while frontier:
             # Pop the first node from the queue
             node = frontier.popleft()
+            explored.add(node.state)  # Mark the state as explored
+
 
             # Expand the node: generate children via successorFunction()
             for action, new_state in node.state.successorFunction():
@@ -108,7 +110,7 @@ USE_GUI = True
 # main : launch BFS on a chosen board
 def main():
     # Select the board (feel free to switch to board2, board3, ...)
-    board = board1
+    board = board4
 
     # 1) Build the initial state from the chosen board
     initial_state = SokoPuzzle(board)
