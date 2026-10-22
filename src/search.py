@@ -1,10 +1,8 @@
 from collections import deque
-from node import Node
-from sokoPuzzle import SokoPuzzle
-from gui import animate_solution
+from src.node import Node
+from src.sokoPuzzle import SokoPuzzle
+from src.gui import animate_solution
 
-
-# Test levels (board1 ... board5)
 # Symbols: 'R' player, 'O' wall, ' ' empty, 'S' target, 'B' box, '.' player on target, '*' box on target
 
 board1 = [
@@ -64,26 +62,20 @@ board5 = [
 class Search:
     # (BFS) algorithm
     def breadthFirst(initial_node):
-
-        # Quick check: the root itself may already be a goal
         if initial_node.state.isGoal():
             return initial_node
 
-        # FIFO queue: first-in, first-out
         frontier = deque([initial_node])
-
-        # Set of visited states (to avoid revisiting)
         explored = set()
 
         while frontier:
-            # Pop the first node from the queue
+            
             node = frontier.popleft()
-            explored.add(node.state)  # Mark the state as explored
+            explored.add(node.state)  
 
 
             # Expand the node: generate children via successorFunction()
             for action, new_state in node.state.successorFunction():
-                # Only consider newly discovered states
                 if new_state not in explored:
                     child = Node(
                         state=new_state,
@@ -92,7 +84,6 @@ class Search:
                         g=node.g + 1
                     )
 
-                    # Goal test before enqueueing (early exit optimization)
                     if new_state.isGoal():
                         return child
 
@@ -101,57 +92,12 @@ class Search:
                         and not any(n.state == child.state for n in frontier)
                     ):
                         frontier.append(child)
-
-        # No solution found
         return None
 
 
 
-USE_GUI = True
+    # A* algorithm ( person 1 )
+    def aStarSearch(initial_node, heuristic) : ...
 
 
-# main : launch BFS on a chosen board
-def main():
-    # Select the board (feel free to switch to board2, board3, ...)
-    board = board4
 
-    # 1) Build the initial state from the chosen board
-    initial_state = SokoPuzzle(board)
-
-    # 2) Build the root node
-    root = Node(state=initial_state, parent=None, action=None, g=0)
-
-    print("=" * 50)
-    print("Initial state:")
-    print(initial_state)
-    print("=" * 50)
-    print("\nRunning BFS ...\n")
-
-    # 3) Run BFS
-    goal_node = Search.breadthFirst(root)
-
-    # 4) Display the results
-    if goal_node is None:
-        print("No solution found.")
-        return
-
-    print("Solution found!")
-    print(f"  Path cost (g)   : {goal_node.g}")
-    print(f"  Solution actions: {goal_node.getSolution()}")
-    print(f"  Number of states in path: {len(goal_node.getPath())}")
-
-    print("\nFinal state:")
-    print(goal_node.state)
-    print("=" * 50)
-
-    if USE_GUI:
-        path = goal_node.getPath()
-        animate_solution(
-            path,
-            goal_node.g,
-            len(goal_node.getSolution())
-    )
-
-
-if __name__ == "__main__":
-    main()

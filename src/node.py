@@ -1,13 +1,12 @@
 class Node:
     def __init__(self, state, parent=None, action=None, g=0):
-     
-        self.state = state   # the current board's state (SokoPuzzle instance)
+        self.state = state   
         self.parent = parent
-        self.action = action  # the action that led to this state         
+        self.action = action      
         self.g = g
         
     
-    def getPath(self):  # list of states from the root to this node
+    def getPath(self): 
         path = []
         current = self
         while current is not None:
@@ -16,7 +15,7 @@ class Node:
         path.reverse()
         return path
 
-    def getSolution(self): #  list of actions from the root to this node
+    def getSolution(self): 
         actions = []
         current = self
         while current is not None and current.action is not None:
@@ -25,5 +24,11 @@ class Node:
         actions.reverse()
         return actions
 
-    def __repr__(self):  # return a string representation of the node, showing the action and cost
+
+
+    # calculate f(n)=g(n)+h(n)    person 1
+    def setF(heuristic) : ...
+
+
+    def __repr__(self):  
         return f"Node(action={self.action}, g={self.g})"

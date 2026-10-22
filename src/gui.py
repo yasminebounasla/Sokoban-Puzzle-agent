@@ -1,23 +1,25 @@
 import pygame
+from pathlib import Path
 
 TILE = 64        # taille d'une case en pixels
 INFO_H = 60      # hauteur de la bande d'info sous la grille
 
-FILES = {
-    "wall": "wall.png",
-    "space": "space.png",
-    "target": "target.png",
-    "box": "box.png",
-    "box_on_target": "box_on_target.png",
-    "player": "player.png",
-}
+ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
 
+FILES = {
+    "wall": ASSETS_DIR / "wall.png",
+    "space": ASSETS_DIR / "space.png",
+    "target": ASSETS_DIR / "target.png",
+    "box": ASSETS_DIR / "box.png",
+    "box_on_target": ASSETS_DIR / "box_on_target.png",
+    "player": ASSETS_DIR / "player.png",
+}
 
 # download the images and scale them to TILE x TILE
 def load_images():
     images = {}
     for name, file in FILES.items():
-        img = pygame.image.load(file)                              # load image from file
+        img = pygame.image.load(str(file))                             # load image from file
         images[name] = pygame.transform.scale(img, (TILE, TILE))   # resize all images to TILE x TILE
     return images
 
