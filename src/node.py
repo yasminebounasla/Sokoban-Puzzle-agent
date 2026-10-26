@@ -4,6 +4,8 @@ class Node:
         self.parent = parent
         self.action = action      
         self.g = g
+        self.h = 0                          
+        self.f = 0 
         
     
     def getPath(self): 
@@ -26,8 +28,10 @@ class Node:
 
 
 
-    # calculate f(n)=g(n)+h(n)    person 1
-    def setF(heuristic) : ...
+    # calculate f(n)=g(n)+h(n)  
+    def setF(self, heuristic):
+        self.h = heuristic(self.state)       # h(n)
+        self.f = self.g + self.h 
 
 
     def __repr__(self):  
