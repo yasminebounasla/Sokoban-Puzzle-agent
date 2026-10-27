@@ -123,15 +123,16 @@ class Search:
                 child = Node(successor, current, action, current.g + 1)   # child.g <- current.g + 1
                 child.setF(h)                                             # child.f <- g + h
 
-                in_open = Search._find(open_list, successor)              # hadi à vérifier ig ce'st child not successor
-                in_closed = Search._find(closed_list, successor)          # same here
+                # decide where to put the child 
+                in_open = Search._find(open_list, successor)              
+                in_closed = Search._find(closed_list, successor)          
 
-                if in_open is None and in_closed is None:        # not in Open and not in Closed
+                if in_open is None and in_closed is None:        # add child to Open list
                     open_list.append(child)
-                elif in_open is not None and in_open.f > child.f:     # in Open with a higher f
+                elif in_open is not None and in_open.f > child.f:     # add it to  Open list with a higher f
                     open_list.remove(in_open)
                     open_list.append(child)
-                elif in_closed is not None and in_closed.f > child.f: # in Closed with a higher f
+                elif in_closed is not None and in_closed.f > child.f:  # in Closed with a higher f
                     closed_list.remove(in_closed)
                     open_list.append(child)
 

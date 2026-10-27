@@ -27,10 +27,8 @@ class Node:
         return actions
 
 
-
-    # calculate f(n)=g(n)+h(n)  
     def setF(self, heuristic):
-        self.h = heuristic(self.state)       # h(n)
+        self.h = heuristic(self.state)       
         self.f = self.g + self.h 
 
 
