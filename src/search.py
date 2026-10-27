@@ -60,8 +60,9 @@ board5 = [
 class Search:
     # (BFS) algorithm
     def breadthFirst(initial_node):
+        steps = 0
         if initial_node.state.isGoal():
-            return initial_node
+            return initial_node, steps
 
         frontier = deque([initial_node])
         explored = set()
@@ -70,7 +71,7 @@ class Search:
             
             node = frontier.popleft()
             explored.add(node.state)  
-
+            steps += 1
 
             # Expand the node: generate children via successorFunction()
             for action, new_state in node.state.successorFunction():
@@ -83,14 +84,14 @@ class Search:
                     )
 
                     if new_state.isGoal():
-                        return child
+                        return child, steps
 
                     if (    # to make sure we don't explore the same state again, we check both explored and frontier
                         child.state not in explored
                         and not any(n.state == child.state for n in frontier)
                     ):
                         frontier.append(child)
-        return None
+        return None, steps
 
 
     # verify if a state exist in open/closed list

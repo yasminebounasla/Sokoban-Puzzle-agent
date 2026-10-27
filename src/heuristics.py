@@ -1,10 +1,12 @@
+#person 2 
+
 import math
 
 class heuristic:
     @staticmethod
     def h1(state):
 
-        grid = state.grid if hasattr(state, 'grid') else state
+        grid = state.board if hasattr(state, 'board') else state
         count = 0
         for row in grid:
             for cell in row:
@@ -15,7 +17,7 @@ class heuristic:
     @staticmethod
     def h2(state):
  
-        grid = state.grid if hasattr(state, 'grid') else state
+        grid = state.board if hasattr(state, 'board') else state
         nb_left = heuristic.h1(state)
         if nb_left == 0:
             return 0
@@ -43,7 +45,7 @@ class heuristic:
     @staticmethod
     def h3(state):
 
-        grid = state.grid if hasattr(state, 'grid') else state
+        grid = state.board if hasattr(state, 'board') else state
         nb_left = heuristic.h1(state)
         if nb_left == 0:
             return 0
