@@ -1,8 +1,5 @@
-#person 2 
 
-import math
-
-class heuristic:
+class Heuristic:
     @staticmethod
     def h1(state):
 
@@ -18,7 +15,7 @@ class heuristic:
     def h2(state):
  
         grid = state.board if hasattr(state, 'board') else state
-        nb_left = heuristic.h1(state)
+        nb_left = Heuristic.h1(state)
         if nb_left == 0:
             return 0
 
@@ -42,11 +39,14 @@ class heuristic:
 
         return 2 * nb_left + manhattan_sum
 
+
+    # h3 = h2 + (distance du robot à la caisse la plus proche, moins 1)
+    # on fait - 1  : le robot doit se placer à côté de la caisse (pas sur la caisse) 
     @staticmethod
     def h3(state):
 
         grid = state.board if hasattr(state, 'board') else state
-        nb_left = heuristic.h1(state)
+        nb_left = Heuristic.h1(state)
         if nb_left == 0:
             return 0
 
@@ -79,7 +79,7 @@ class heuristic:
                     return float('inf')  # Prune this branch completely
 
         # 2. Base h2 value calculation
-        h2_val = heuristic.h2(state)
+        h2_val = Heuristic.h2(state)
 
         # 3. Add distance from player to the nearest unplaced box
         if player_pos and boxes_left:
@@ -96,8 +96,8 @@ class heuristic:
     def getHeuristic(name):
       
         heuristics = {
-            'h1': heuristic.h1,
-            'h2': heuristic.h2,
-            'h3': heuristic.h3
+            'h1': Heuristic.h1,
+            'h2': Heuristic.h2,
+            'h3': Heuristic.h3
         }
-        return heuristics.get(name, heuristic.h1)
+        return heuristics.get(name, Heuristic.h1)
