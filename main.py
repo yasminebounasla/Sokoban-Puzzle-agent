@@ -3,7 +3,7 @@ from src.sokoPuzzle import SokoPuzzle
 from src.search import Search
 from src.gui import animate_solution
 from src.search import Search, board1, board2, board3, board4, board5
-
+from src.heuristics import heuristic
 USE_GUI = True
 
 
@@ -23,15 +23,18 @@ def main():
     print(initial_state)
     print("=" * 50)
     print("\nRunning BFS ...\n")
+    #print("\nRunning A* with h1 ...\n")
 
-    goal_node = Search.breadthFirst(root)
 
+    goal_node, steps = Search.breadthFirst(root)
+    #goal_node, steps = Search.aStar(root, heuristic.h1)
     if goal_node is None:
         print("No solution found.")
         return
 
     print("Solution found!")
     print(f"Path cost (g): {goal_node.g}")
+    print(f"Expanded nodes: {steps}")
     print(f"Solution actions: {goal_node.getSolution()}")
     print(f"Number of states in path: {len(goal_node.getPath())}")
 
