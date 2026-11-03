@@ -8,8 +8,17 @@ from src.search import Search, board1, board2, board3, board4, board5, board6, b
 from src.sokoPuzzle import SokoPuzzle
 
 TILE = 64        # taille d'une case en pixels
-INFO_H = 60      # hauteur de la bande d'info sous la grille
+HEADER_H = 50    # hauteur de la bande de titre au-dessus de la grille
+INFO_H = 110     # hauteur de la bande d'info sous la grille
+MIN_W = 560      # largeur minimale de la fenetre (les petits plateaux sont centres)
 MENU_SIZE = (800, 600)
+
+# colors of the window
+BG = (26, 31, 40)          # background
+PANEL = (36, 44, 56)       # title band and info band
+ACCENT = (72, 112, 153)    # blue lines
+WHITE = (245, 245, 245)
+GRAY = (160, 168, 178)
 
 ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
 
@@ -63,13 +72,13 @@ def _choose_option(title, options):
 
     while True:
         mouse_pos = pygame.mouse.get_pos()
-        screen.fill((26, 31, 40))
-        heading = title_font.render(title, True, (245, 245, 245))
+        screen.fill(BG)
+        heading = title_font.render(title, True, WHITE)
         screen.blit(heading, heading.get_rect(center=(MENU_SIZE[0] // 2, 55)))
 
         for index, (option, rect) in enumerate(zip(options, button_rects)):
             hovered = rect.collidepoint(mouse_pos)
-            color = (72, 112, 153) if hovered else (48, 62, 78)
+            color = ACCENT if hovered else (48, 62, 78)
             pygame.draw.rect(screen, color, rect, border_radius=8)
             pygame.draw.rect(screen, (112, 132, 154), rect, 1, border_radius=8)
             label = option_font.render(f"{index + 1}.  {option}", True, (255, 255, 255))
@@ -172,12 +181,42 @@ def draw_board(screen, state, images):
                 screen.blit(images["space"], pos)             # ' ' -> space
 
 
-# display the cost and number of steps in the info band at the bottom of the window
-def show_info(screen, cost, steps):
-    font = pygame.font.SysFont("arial", 22)                                     # create a font object
-    text = font.render(f"Cost: {cost}   Steps: {steps}", True, (255, 255, 255)) # create a text surface with white color
-    y = screen.get_height() - INFO_H + 15                                       # position of the text (15 pixels from the top of the info band)
-    screen.blit(text, (10, y))                     # draw the text on the screen at (10, y) with 10 pixels from the left
+# draw the title band at the top: board name + algorithm
+def show_header(screen, title):
+    width = screen.get_width()
+    pygame.draw.rect(screen, PANEL, (0, 0, width, HEADER_H))                    # band background
+    pygame.draw.line(screen, ACCENT, (0, HEADER_H - 1), (width, HEADER_H - 1), 2)  # blue line under it
+    font = pygame.font.SysFont("arial", 24, bold=True)
+    text = font.render(title, True, WHITE)
+    screen.blit(text, text.get_rect(center=(width // 2, HEADER_H // 2)))        # title centered
+
+
+# display cost, steps and progress in the info band at the bottom of the window
+def show_info(screen, cost, steps, move, total):
+    top = screen.get_height() - INFO_H                                          # y where the info band starts
+    pygame.draw.rect(screen, PANEL, (0, top, screen.get_width(), INFO_H))       # band background
+    pygame.draw.line(screen, ACCENT, (0, top), (screen.get_width(), top), 2)    # blue line above it
+    label_font = pygame.font.SysFont("arial", 15)
+    value_font = pygame.font.SysFont("arial", 26, bold=True)
+    items = (("COST", cost), ("STEPS", steps), ("MOVE", f"{move} / {total}"))   # 3 columns
+    column = screen.get_width() // len(items)
+    for k, (label, value) in enumerate(items):
+        x = k * column + column // 2                                            # center of the column
+        label_text = label_font.render(label, True, GRAY)
+        value_text = value_font.render(str(value), True, WHITE)
+        screen.blit(label_text, label_text.get_rect(center=(x, top + 18)))      # small gray label
+        screen.blit(value_text, value_text.get_rect(center=(x, top + 44)))      # big white value
+
+
+# small legend that explains the deadlock colors
+def show_legend(screen):
+    top = screen.get_height() - INFO_H
+    font = pygame.font.SysFont("arial", 15)
+    x = 12
+    for color, name in (((230, 45, 45), "corner deadlock"), ((245, 205, 45), "line deadlock")):
+        pygame.draw.rect(screen, color, (x, top + 68, 14, 14))                  # colored square
+        screen.blit(font.render(name, True, GRAY), (x + 22, top + 67))          # its name
+        x += 200
 
 
 def draw_deadlocks(screen, corners, lines):
@@ -195,30 +234,39 @@ def draw_deadlocks(screen, corners, lines):
 
 
 # animate the solution path on the screen, with a pause between each state
-def animate_solution(path, cost, steps, deadlock_cells=None):
+def animate_solution(path, cost, steps, deadlock_cells=None, title=""):
     pygame.init()                                                       # start pygame
     rows = len(path[0].board)                                           # number of rows in the board
     cols = len(path[0].board[0])                                        # number of columns in the board
-    screen = pygame.display.set_mode((cols * TILE, rows * TILE + INFO_H))  # create the window (board + info band)
+    board_w, board_h = cols * TILE, rows * TILE                         # size of the grid in pixels
+    win_w = max(board_w, MIN_W)                                         # small boards are centered in the window
+    screen = pygame.display.set_mode((win_w, HEADER_H + board_h + INFO_H))  # title band + grid + info band
     pygame.display.set_caption("Sokoban")                               # window title
     images = load_images()                                              # load the images once
     corners, lines = deadlock_cells or (set(), set())
+    board_surface = pygame.Surface((board_w, board_h))                  # the grid is drawn here, then centered
+    board_pos = ((win_w - board_w) // 2, HEADER_H)                      # where the grid goes in the window
 
-    for state in path:                                                  # state = one picture of the board
+    for move, state in enumerate(path):                                 # state = one picture of the board
         for event in pygame.event.get():                                # events = everything the user did
             if event.type == pygame.QUIT:                               # if the user closed the window, stop the animation
                 pygame.quit()
                 return False
-        screen.fill((30, 30, 30))                                       # gray background for the info band
-        draw_board(screen, state, images)                               # draw the current state
-        draw_deadlocks(screen, corners, lines)
-        show_info(screen, cost, steps)                                  # draw the cost and steps
+        screen.fill(BG)                                                 # background color
+        show_header(screen, title)                                      # board name + algorithm
+        draw_board(board_surface, state, images)                        # draw the current state on the grid surface
+        draw_deadlocks(board_surface, corners, lines)                   # deadlock colors (empty if not used)
+        screen.blit(board_surface, board_pos)                           # put the grid in the middle of the window
+        pygame.draw.rect(screen, ACCENT, (*board_pos, board_w, board_h), 2)  # blue frame around the grid
+        show_info(screen, cost, steps, move, len(path) - 1)             # cost, steps and move number
+        if corners or lines:
+            show_legend(screen)                                         # explain the colors
         pygame.display.flip()                                           # show what we just drew
         pygame.time.wait(400)                                           # pause between two states (ms)
 
     font = pygame.font.SysFont("arial", 16)
     prompt = font.render("Press R or Enter to choose another board, or Esc to quit.", True, (200, 205, 212))
-    screen.blit(prompt, (10, screen.get_height() - 23))
+    screen.blit(prompt, (12, screen.get_height() - 24))
     pygame.display.flip()
 
     choose_another = False
@@ -266,5 +314,6 @@ def run_gui():
         deadlock_cells = None
         if "deadlock" in algorithm:
             deadlock_cells = findDeadCells(SokoPuzzle(board).board)
-        if not animate_solution(solution, cost, steps, deadlock_cells):
+        title = f"{board_name}  |  {algorithm}"
+        if not animate_solution(solution, cost, steps, deadlock_cells, title):
             return
