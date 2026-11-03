@@ -1,6 +1,6 @@
 from collections import deque
 from src.node import Node   
-from deadlock import isDeadlock    
+from src.deadlock import isDeadlock     
 
 # Symbols: 'R' player, 'O' wall, ' ' empty, 'S' target, 'B' box, '.' player on target, '*' box on target
 
