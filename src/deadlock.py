@@ -105,14 +105,13 @@ def isDeadlock(state, dead_cells):
     if dead_cells is None:
         return False
         
-    corners, lines = dead_cells
-    all_dead_cells = corners.union(lines)
+
     
     # Check if any standard box 'B' (not on a target '*') is on a dead cell
     for r in range(len(state.board)):
         for c in range(len(state.board[0])):
             if state.board[r][c] == 'B':
-                if (r, c) in all_dead_cells:
+                if (r, c) in dead_cells:
                     return True
                     
     return False
