@@ -1,12 +1,11 @@
-#person 2 
-
 import math
 
 class heuristic:
+
     @staticmethod
     def h1(state):
 
-        grid = state.board if hasattr(state, 'board') else state
+        grid = state.board 
         count = 0
         for row in grid:
             for cell in row:
@@ -17,7 +16,7 @@ class heuristic:
     @staticmethod
     def h2(state):
  
-        grid = state.board if hasattr(state, 'board') else state
+        grid = state.board 
         nb_left = heuristic.h1(state)
         if nb_left == 0:
             return 0
@@ -36,16 +35,16 @@ class heuristic:
 
         manhattan_sum = 0
         for bx, by in boxes_left:
-            # Find minimum Manhattan distance to the nearest target
+            
             min_dist = min(abs(bx - tx) + abs(by - ty) for tx, ty in targets)
             manhattan_sum += min_dist
 
-        return 2 * nb_left + manhattan_sum
+        return nb_left + manhattan_sum
 
     @staticmethod
     def h3(state):
 
-        grid = state.board if hasattr(state, 'board') else state
+        grid = state.board 
         nb_left = heuristic.h1(state)
         if nb_left == 0:
             return 0
@@ -65,23 +64,8 @@ class heuristic:
                 if cell in ('S', '.', '*'):
                     targets.append((r, c))
 
-        # 1. Corner Deadlock Detection:
-        # If an unplaced box is trapped in a corner formed by walls, the state is unsolvable
-        for bx, by in boxes_left:
-            if (bx, by) not in targets:
-                wall_up = grid[bx - 1][by] == 'O'
-                wall_down = grid[bx + 1][by] == 'O'
-                wall_left = grid[bx][by - 1] == 'O'
-                wall_right = grid[bx][by + 1] == 'O'
-
-                if (wall_up and wall_left) or (wall_up and wall_right) or \
-                   (wall_down and wall_left) or (wall_down and wall_right):
-                    return float('inf')  # Prune this branch completely
-
-        # 2. Base h2 value calculation
         h2_val = heuristic.h2(state)
 
-        # 3. Add distance from player to the nearest unplaced box
         if player_pos and boxes_left:
             px, py = player_pos
             min_player_to_box = min(abs(px - bx) + abs(py - by) for bx, by in boxes_left)
