@@ -208,7 +208,7 @@ def animate_solution(path, cost, steps, deadlock_cells=None):
         for event in pygame.event.get():                                # events = everything the user did
             if event.type == pygame.QUIT:                               # if the user closed the window, stop the animation
                 pygame.quit()
-                return
+                return False
         screen.fill((30, 30, 30))                                       # gray background for the info band
         draw_board(screen, state, images)                               # draw the current state
         draw_deadlocks(screen, corners, lines)
@@ -216,38 +216,55 @@ def animate_solution(path, cost, steps, deadlock_cells=None):
         pygame.display.flip()                                           # show what we just drew
         pygame.time.wait(400)                                           # pause between two states (ms)
 
-    running = True                                                      # keep the window open at the end
+    font = pygame.font.SysFont("arial", 16)
+    prompt = font.render("Press R or Enter to choose another board, or Esc to quit.", True, (200, 205, 212))
+    screen.blit(prompt, (10, screen.get_height() - 23))
+    pygame.display.flip()
+
+    choose_another = False
     clock = pygame.time.Clock()
-    while running:
+    while True:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:                               # wait until the user closes the window
-                running = False
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False
+            if event.type == pygame.KEYDOWN:
+                if event.key in (pygame.K_r, pygame.K_RETURN, pygame.K_KP_ENTER):
+                    choose_another = True
+                    break
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    return False
+        if choose_another:
+            break
         clock.tick(30)
-    pygame.quit()                                                       # close pygame
+    pygame.quit()
+    return True
 
 
 def run_gui():
     """Run the board/algorithm selection, solve the puzzle, and animate its solution."""
-    board_choice = choose_board()
-    if board_choice is None:
-        pygame.quit()
-        return
-    board_name, board = board_choice
+    while True:
+        board_choice = choose_board()
+        if board_choice is None:
+            pygame.quit()
+            return
+        board_name, board = board_choice
 
-    algorithm = choose_algorithm()
-    if algorithm is None:
-        pygame.quit()
-        return
+        algorithm = choose_algorithm()
+        if algorithm is None:
+            pygame.quit()
+            return
 
-    solution, cost, steps = run_algorithm(algorithm, board)
-    print(f"{board_name} | {algorithm} | expanded: {steps}")
-    if solution is None:
-        print("No solution found.")
-        pygame.quit()
-        return
+        solution, cost, steps = run_algorithm(algorithm, board)
+        print(f"{board_name} | {algorithm} | expanded: {steps}")
+        if solution is None:
+            print("No solution found.")
+            continue
 
-    print(f"Solution cost: {cost}")
-    deadlock_cells = None
-    if "deadlock" in algorithm:
-        deadlock_cells = findDeadCells(SokoPuzzle(board).board)
-    animate_solution(solution, cost, steps, deadlock_cells)
+        print(f"Solution cost: {cost}")
+        deadlock_cells = None
+        if "deadlock" in algorithm:
+            deadlock_cells = findDeadCells(SokoPuzzle(board).board)
+        if not animate_solution(solution, cost, steps, deadlock_cells):
+            return
