@@ -1,13 +1,16 @@
 from src.node import Node
 from src.sokoPuzzle import SokoPuzzle
 from src.search import Search
-from src.gui import animate_solution
-from src.search import Search, board1, board2, board3, board4, board5
-from src.heuristics import heuristic
+from src.gui import run_gui
+from src.search import board4
 USE_GUI = True
 
 
 def main():
+    if USE_GUI:
+        run_gui()
+        return
+
     board = board4
 
     initial_state = SokoPuzzle(board)
@@ -23,11 +26,8 @@ def main():
     print(initial_state)
     print("=" * 50)
     print("\nRunning BFS ...\n")
-    #print("\nRunning A* with h1 ...\n")
-
 
     goal_node, steps = Search.breadthFirst(root)
-    #goal_node, steps = Search.aStar(root, heuristic.h1)
     if goal_node is None:
         print("No solution found.")
         return
@@ -40,14 +40,6 @@ def main():
 
     print("\nFinal state:")
     print(goal_node.state)
-
-    if USE_GUI:
-        animate_solution(
-            goal_node.getPath(),
-            goal_node.g,
-            len(goal_node.getSolution())
-        )
-
 
 if __name__ == "__main__":
     main()
