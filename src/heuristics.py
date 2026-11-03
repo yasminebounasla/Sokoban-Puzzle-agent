@@ -65,19 +65,6 @@ class Heuristic:
                 if cell in ('S', '.', '*'):
                     targets.append((r, c))
 
-        # 1. Corner Deadlock Detection:
-        # If an unplaced box is trapped in a corner formed by walls, the state is unsolvable
-        for bx, by in boxes_left:
-            if (bx, by) not in targets:
-                wall_up = grid[bx - 1][by] == 'O'
-                wall_down = grid[bx + 1][by] == 'O'
-                wall_left = grid[bx][by - 1] == 'O'
-                wall_right = grid[bx][by + 1] == 'O'
-
-                if (wall_up and wall_left) or (wall_up and wall_right) or \
-                   (wall_down and wall_left) or (wall_down and wall_right):
-                    return float('inf')  # Prune this branch completely
-
         # 2. Base h2 value calculation
         h2_val = Heuristic.h2(state)
 

@@ -1,5 +1,6 @@
 from collections import deque
-from src.node import Node       
+from src.node import Node   
+from deadlock import isDeadlock    
 
 # Symbols: 'R' player, 'O' wall, ' ' empty, 'S' target, 'B' box, '.' player on target, '*' box on target
 
@@ -77,6 +78,7 @@ board7 = [
 ]
 
 class Search:
+
     # (BFS) algorithm
     def breadthFirst(initial_node):
         steps = 0
@@ -121,10 +123,14 @@ class Search:
                 return n
         return None
 
-    
+
+    pruned = []   # the list of pruned states (deadlocks) to avoid exploring them again
+
+
     # A* algorithm 
     @staticmethod
-    def aStar(initial_node, h):                         # h1, h2 or h3
+    def aStar(initial_node, h, dead_cells=None):     
+        Search.pruned = []                    
         initial_node.setF(h)                            # calculate first f(n)
         open_list = [initial_node]                      
         closed_list = []                                
@@ -139,6 +145,9 @@ class Search:
             closed_list.append(current)                 # add this node to closed list
 
             for action, successor in current.state.successorFunction():
+                if dead_cells and isDeadlock(successor, dead_cells):
+                    Search.pruned.append(successor)
+                    continue
                 child = Node(successor, current, action, current.g + 1)   # child.g <- current.g + 1
                 child.setF(h)                                             # child.f <- g + h
 
