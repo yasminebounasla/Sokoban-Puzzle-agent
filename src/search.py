@@ -57,6 +57,25 @@ board5 = [
     "  OOOOO  ",
 ]
 
+board6 = [
+    "OOOOOOO",
+    "OS O RO",
+    "O  OB O",
+    "OS  B O",
+    "O  OB O",
+    "OS O  O",
+    "OOOOOOO"
+]
+
+board7 = [
+    "OOOOOO  ",
+    "OSSS OOO",
+    "O S B  O",
+    "O  BBB O",
+    "OOOO  RO",
+    "   OOOOO"
+]
+
 class Search:
     # (BFS) algorithm
     def breadthFirst(initial_node):
